@@ -1,0 +1,120 @@
+<div class="data-table-container">
+  <p-table
+    [value]="data"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    [currentPageReportTemplate]="currentPageReportTemplate"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    (onPage)="onPageChange($event)"
+    [selection]="selectedItems"
+    [selectionMode]="selectionMode"
+    (onRowSelect)="onSelectionChange($event)"
+    (onRowUnselect)="onSelectionChange($event)"
+    (onSort)="onSortChange($event)"
+    styleClass="p-datatable-striped p-datatable-gridlines">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngIf="selectionMode" style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th *ngFor="let col of columns"
+            [pSortableColumn]="col.field"
+            [style.width]="col.width">
+          {{ col.header }}
+          <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+        </th>
+        <th *ngIf="hasActions()" style="width: 120px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+      <tr [class.row-selected]="isSelected(rowData)">
+        <td *ngIf="selectionMode">
+          <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+        </td>
+
+        <td *ngFor="let col of columns">
+          <ng-container [ngSwitch]="col.template">
+            <!-- Template Actions -->
+            <ng-container *ngSwitchCase="'actions'">
+              <div class="action-buttons">
+                <p-button
+                  icon="pi pi-eye"
+                  styleClass="p-button-text p-button-info"
+                  pTooltip="Voir"
+                  tooltipPosition="top"
+                  (onClick)="onRowAction('view', rowData)">
+                </p-button>
+                <p-button
+                  icon="pi pi-pencil"
+                  styleClass="p-button-text p-button-warning"
+                  pTooltip="Modifier"
+                  tooltipPosition="top"
+                  (onClick)="onRowAction('edit', rowData)">
+                </p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-text p-button-danger"
+                  pTooltip="Supprimer"
+                  tooltipPosition="top"
+                  (onClick)="onRowAction('delete', rowData)">
+                </p-button>
+              </div>
+            </ng-container>
+
+            <!-- Template Boolean -->
+            <ng-container *ngSwitchCase="'boolean'">
+              <i
+                [class]="rowData[col.field] ? 'pi pi-check-circle text-success' : 'pi pi-times-circle text-danger'">
+              </i>
+            </ng-container>
+
+            <!-- Template Date -->
+            <ng-container *ngSwitchCase="'date'">
+              {{ rowData[col.field] | date:'dd/MM/yyyy' }}
+            </ng-container>
+
+            <!-- Default Template -->
+            <ng-container *ngSwitchDefault>
+              {{ rowData[col.field] }}
+            </ng-container>
+          </ng-container>
+        </td>
+
+        <td *ngIf="hasActions() && !hasActionColumn()" class="action-cell">
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-eye"
+              styleClass="p-button-text p-button-info"
+              pTooltip="Voir"
+              tooltipPosition="top"
+              (onClick)="onRowAction('view', rowData)">
+            </p-button>
+            <p-button
+              icon="pi pi-pencil"
+              styleClass="p-button-text p-button-warning"
+              pTooltip="Modifier"
+              tooltipPosition="top"
+              (onClick)="onRowAction('edit', rowData)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="getColspan()" class="empty-message">
+          <div class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 2rem"></i>
+            <h3>Aucune donnée disponible</h3>
+            <p>Aucun enregistrement n'a été trouvé.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,54 @@
+.error-message {
+  margin: 1rem 0;
+
+  &.error {
+    .error-icon i {
+      color: #ef4444;
+    }
+  }
+
+  &.warning {
+    .error-icon i {
+      color: #f59e0b;
+    }
+  }
+
+  &.info {
+    .error-icon i {
+      color: #06b6d4;
+    }
+  }
+
+  .error-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .error-icon {
+      font-size: 1.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .error-details {
+      flex: 1;
+
+      h3 {
+        margin: 0 0 0.5rem 0;
+        color: #1f2937;
+        font-size: 1.125rem;
+      }
+
+      p {
+        margin: 0;
+        color: #6b7280;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .error-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

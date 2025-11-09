@@ -1,0 +1,39 @@
+.data-table-container {
+  .p-datatable {
+    .row-selected {
+      background-color: #f0f9ff !important;
+    }
+
+    .action-cell {
+      text-align: center;
+
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.25rem;
+      }
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 3rem 1rem;
+
+      .empty-state {
+        i {
+          color: #9ca3af;
+          margin-bottom: 1rem;
+        }
+
+        h3 {
+          color: #374151;
+          margin: 0 0 0.5rem 0;
+        }
+
+        p {
+          color: #6b7280;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
