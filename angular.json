@@ -30,6 +30,12 @@
               }
             ],
             "styles": [
+              "src/assets/styles/_variables.scss",
+              "src/assets/styles/_mixins.scss",
+              "src/assets/styles/_utilities.scss",
+              "src/assets/styles/_themes.scss",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ]
           },
