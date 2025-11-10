@@ -1,3 +1,47 @@
-<main class="app-content">
-  <router-outlet></router-outlet>
-</main>
+<div class="app-container">
+  <!-- 🏗️ Header Global -->
+  <app-header [title]="title()"></app-header>
+
+  <!-- 📱 Contenu Principal -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- ⏳ Loading Global -->
+  <app-loading-spinner
+    [loading]="isLoading()"
+    message="Chargement en cours...">
+  </app-loading-spinner>
+
+  <!-- 🚨 Error Global -->
+  <app-error-message
+    *ngIf="hasError()"
+    [title]="'Erreur Application'"
+    [message]="errorMessage()"
+    type="error"
+    [showAction]="true"
+    actionText="Fermer"
+    actionIcon="pi pi-times"
+    (action)="clearError()">
+  </app-error-message>
+
+  <app-layout
+    [showSidebar]="true"
+    [showFooter]="true"
+    layoutType="default">
+
+    <!-- Contenu de la page actuelle -->
+    <router-outlet></router-outlet>
+
+  </app-layout>
+
+  <!-- Composants globaux -->
+  <app-loading-spinner [loading]="isLoading()"></app-loading-spinner>
+  <app-error-message
+    *ngIf="hasError()"
+    [message]="errorMessage()"
+    (action)="clearError()">
+  </app-error-message>
+  <!-- 🔔 Notifications Globales -->
+  <!-- Les notifications PrimeNG Toast seront ajoutées ici plus tard -->
+</div>
