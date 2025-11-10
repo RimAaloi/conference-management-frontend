@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { User } from '../../shared/models/auth/user.model';
-import { TokenResponse, AuthState } from '../../shared/models/auth/token.model'; // ✅ Correction ici
-import { Config } from './config';
+import { User, LoginRequest, RegisterRequest } from '../../shared/models/auth/user.model';
+import { TokenResponse, AuthState } from '../../shared/models/auth/token.model';
+import { ConfigService } from './config';
+import { NotificationService } from './notification';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
   private authState = new BehaviorSubject<AuthState>({
     isAuthenticated: false,
     user: null,
@@ -20,20 +22,20 @@ export class AuthService {
   public authState$ = this.authState.asObservable();
 
   constructor(
-    private http: HttpClient,
-    private config: Config
+      private http: HttpClient,
+      private config: ConfigService,
+      private notification: NotificationService
   ) {
     this.checkExistingAuth();
   }
 
   private checkExistingAuth(): void {
-    // Vérifier si un token existe dans le storage
     const token = this.getStoredToken();
     if (token && !this.isTokenExpired(token)) {
-      // TODO: Implémenter la vérification du token avec le backend
+      const user = this.getStoredUser();
       this.authState.next({
         isAuthenticated: true,
-        user: this.getStoredUser(),
+        user,
         accessToken: token,
         refreshToken: this.getStoredRefreshToken(),
         expiresAt: this.getStoredExpiresAt()
@@ -41,12 +43,12 @@ export class AuthService {
     }
   }
 
-  login(credentials: { username: string; password: string }): Observable<any> {
-    // TODO: Implémenter la logique de connexion avec Keycloak
+  login(credentials: LoginRequest): Observable<any> {
+    // TODO: Remplacer par l'appel réel à Keycloak
     const mockUser: User = {
       id: '1',
       username: credentials.username,
-      email: 'user@example.com',
+      email: `${credentials.username}@example.com`,
       firstName: 'John',
       lastName: 'Doe',
       roles: ['user'],
@@ -54,7 +56,7 @@ export class AuthService {
       createdAt: new Date()
     };
 
-    const mockToken = 'mock-jwt-token';
+    const mockToken = 'mock-jwt-token-' + Date.now();
 
     this.setAuthState({
       isAuthenticated: true,
@@ -64,17 +66,39 @@ export class AuthService {
       expiresAt: Date.now() + 3600000 // 1 heure
     });
 
+    this.notification.success('Connexion', 'Connexion réussie !');
+
     return new Observable(subscriber => {
-      subscriber.next({ success: true });
+      subscriber.next({ success: true, user: mockUser });
       subscriber.complete();
     });
   }
 
   logout(): void {
     this.clearAuthState();
+    this.notification.info('Déconnexion', 'Vous avez été déconnecté');
     // TODO: Rediriger vers la page de login
   }
 
+  register(userData: RegisterRequest): Observable<any> {
+    // TODO: Implémenter l'appel d'inscription
+    return new Observable(subscriber => {
+      setTimeout(() => {
+        subscriber.next({ success: true });
+        subscriber.complete();
+      }, 1000);
+    });
+  }
+
+  refreshToken(): Observable<any> {
+    // TODO: Implémenter le refresh token
+    return new Observable(subscriber => {
+      subscriber.next({ success: true, token: 'new-token' });
+      subscriber.complete();
+    });
+  }
+
+  // Getters publics
   isAuthenticated(): boolean {
     return this.authState.value.isAuthenticated;
   }
@@ -87,6 +111,12 @@ export class AuthService {
     return this.authState.value.accessToken;
   }
 
+  hasRole(role: string): boolean {
+    const user = this.getCurrentUser();
+    return user ? user.roles.includes(role) : false;
+  }
+
+  // Méthodes privées de gestion d'état
   private setAuthState(state: AuthState): void {
     this.authState.next(state);
     this.storeAuthData(state);
@@ -103,7 +133,7 @@ export class AuthService {
     this.clearStoredAuthData();
   }
 
-  // Méthodes de stockage (localStorage)
+  // Stockage localStorage
   private storeAuthData(state: AuthState): void {
     localStorage.setItem('access_token', state.accessToken || '');
     localStorage.setItem('refresh_token', state.refreshToken || '');
@@ -137,7 +167,8 @@ export class AuthService {
   }
 
   private isTokenExpired(token: string): boolean {
-    // TODO: Implémenter la vérification d'expiration du token
-    return false;
+    // TODO: Implémenter la vérification d'expiration réelle
+    const expiresAt = this.getStoredExpiresAt();
+    return expiresAt ? Date.now() > expiresAt : true;
   }
 }

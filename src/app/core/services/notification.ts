@@ -8,6 +8,10 @@ export interface Notification {
   message: string;
   duration?: number;
   timestamp: Date;
+  action?: {
+    label: string;
+    callback: () => void;
+  };
 }
 
 @Injectable({
@@ -19,6 +23,7 @@ export class NotificationService {
 
   public notifications$ = this.notifications.asObservable();
 
+  // ===== PUBLIC METHODS =====
   show(notification: Omit<Notification, 'id' | 'timestamp'>): number {
     const newNotification: Notification = {
       ...notification,
@@ -29,7 +34,7 @@ export class NotificationService {
     const currentNotifications = this.notifications.value;
     this.notifications.next([...currentNotifications, newNotification]);
 
-    // Auto-remove if duration is set
+    // Auto-remove si durée définie
     if (newNotification.duration && newNotification.duration > 0) {
       setTimeout(() => {
         this.remove(newNotification.id);
@@ -75,6 +80,7 @@ export class NotificationService {
     });
   }
 
+  // ===== MANAGEMENT METHODS =====
   remove(id: number): void {
     const currentNotifications = this.notifications.value;
     const filteredNotifications = currentNotifications.filter(
@@ -87,7 +93,42 @@ export class NotificationService {
     this.notifications.next([]);
   }
 
+  clearByType(type: Notification['type']): void {
+    const currentNotifications = this.notifications.value;
+    const filteredNotifications = currentNotifications.filter(
+      notification => notification.type !== type
+    );
+    this.notifications.next(filteredNotifications);
+  }
+
+  // ===== GETTERS =====
   getNotifications(): Notification[] {
     return this.notifications.value;
+  }
+
+  getNotificationCount(): number {
+    return this.notifications.value.length;
+  }
+
+  hasNotifications(): boolean {
+    return this.notifications.value.length > 0;
+  }
+
+  // ===== UTILITY METHODS =====
+  showApiSuccess(message: string = 'Opération réussie'): number {
+    return this.success('Succès', message);
+  }
+
+  showApiError(error: any, defaultMessage: string = 'Une erreur est survenue'): number {
+    const message = error?.message || error?.error?.message || defaultMessage;
+    return this.error('Erreur', message);
+  }
+
+  showLoading(message: string = 'Chargement...'): number {
+    return this.info('Chargement', message, 0); // 0 = pas de auto-remove
+  }
+
+  hideLoading(notificationId: number): void {
+    this.remove(notificationId);
   }
 }

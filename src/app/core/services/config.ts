@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class Config {
+export class ConfigService {
   private config = environment;
 
   // API URLs
@@ -20,6 +20,10 @@ export class Config {
     return this.config.conferenceServiceUrl || `${this.config.gatewayUrl}/conferences`;
   }
 
+  getReviewServiceUrl(): string {
+    return `${this.config.gatewayUrl}/reviews`;
+  }
+
   // Keycloak Configuration
   getKeycloakConfig() {
     return this.config.keycloak;
@@ -27,7 +31,8 @@ export class Config {
 
   // Feature Flags
   isFeatureEnabled(feature: string): boolean {
-    return this.config.features[feature as keyof typeof this.config.features] || false;
+    const features = this.config.features as Record<string, boolean>;
+    return features[feature] || false;
   }
 
   // Environment
@@ -46,5 +51,23 @@ export class Config {
 
   getLogLevel(): string {
     return this.config.logLevel;
+  }
+
+  // App Settings
+  getAppName(): string {
+    return 'Conference Management';
+  }
+
+  getAppVersion(): string {
+    return '1.0.0';
+  }
+
+  // API Timeouts
+  getApiTimeout(): number {
+    return 30000; // 30 seconds
+  }
+
+  getRefreshTokenInterval(): number {
+    return 300000; // 5 minutes
   }
 }
